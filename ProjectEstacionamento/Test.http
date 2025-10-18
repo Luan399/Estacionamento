@@ -1,0 +1,24 @@
+### CADASTRAR CARRO
+POST http://localhost:5117/api/carro/cadastrar
+Content-Type: application/json
+
+{
+  "placa": "ABC-1234",
+  "modelo": "Fiat Uno"
+}
+
+### LISTAR TODOS OS CARROS
+GET http://localhost:5117/api/carro/listar
+Accept: application/json
+
+### REMOVER CARRO
+DELETE http://localhost:5117/api/carro/remover/{ID}
+
+### ALTERAR CARRO
+PATCH http://localhost:5117/api/carro/alterar/6d97134d-70b7-4005-a5e9-d81c2ba72ca2
+Content-Type: application/json
+
+{
+    "placa": "XYZ-5678",
+    "modelo": "Chevrolet Onix"
+}
