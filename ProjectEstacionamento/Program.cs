@@ -108,9 +108,68 @@ app.MapGet("/api/carro/estacionados", async ([FromServices] AppDataContext ctx) 
         .ToListAsync();
 
     if (!carros.Any())
-        return Results.Ok("Não há veículos estacionados" );
+        return Results.Ok("Não há veículos estacionados");
 
     return Results.Ok(carros);
+});
+
+
+// Saída de veículo
+app.MapPost("/api/carro/saida/{id}", async ([FromRoute] string id, [FromServices] AppDataContext ctx) =>
+{
+    var carro = await ctx.Carros
+        .Include(c => c.Vaga)
+        .FirstOrDefaultAsync(c => c.Id == id && c.Estacionado);
+
+    if (carro is null) return Results.NotFound("Veículo não encontrado ou já saiu.");
+
+    var horaSaida = DateTime.Now;
+    var horaEntrada = carro.HoraEntrada ?? carro.CriadoEm;
+    var minutos = (int)Math.Ceiling((horaSaida - horaEntrada).TotalMinutes);
+
+    var saida = new Saida
+    {
+        VeiculoId = carro.Id,
+        VeiculoPlaca = carro.Placa,
+        HoraEntrada = horaEntrada,
+        HoraSaida = horaSaida,
+        TempoPermanenciaMinutos = minutos
+    };
+
+    ctx.Saidas.Add(saida);
+
+    if (carro.Vaga != null)
+    {
+        carro.Vaga.Ocupada = false;
+        carro.Vaga.VeiculoId = null;
+    }
+
+    carro.Estacionado = false;
+    carro.VagaId = null;
+    carro.HoraEntrada = null;
+
+    await ctx.SaveChangesAsync();
+
+    return Results.Ok(new { Saida = saida, TempoMinutos = minutos });
+});
+
+// Relatório diário
+app.MapGet("/api/carro/relatorio-diario", async ([FromServices] AppDataContext ctx) =>
+{
+    var hoje = DateTime.Now.Date;
+    var saidas = await ctx.Saidas
+        .Where(s => s.HoraSaida.Date == hoje)
+        .ToListAsync();
+
+    var total = saidas.Count;
+    var media = total == 0 ? 0 : saidas.Average(s => s.TempoPermanenciaMinutos);
+
+    return Results.Ok(new
+    {
+        Data = hoje,
+        TotalSaidas = total,
+        TempoMedioMinutos = media
+    });
 });
 
 

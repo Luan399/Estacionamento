@@ -36,3 +36,12 @@ Content-Type: application/json
 ### LISTAR VEÍCULOS ESTACIONADOS
 GET http://localhost:5117/api/carro/estacionados
 Accept: application/json
+
+### SAÍDA DE VEÍCULO (DESOCUPAR VAGA)
+POST http://localhost:5117/api/carro/saida/ce425f69-42c5-41e2-be6b-ef14164f32d3
+
+
+
+### RELATÓRIO DIÁRIO DE SAÍDAS
+GET http://localhost:5117/api/carro/relatorio-diario
+Accept: application/json
