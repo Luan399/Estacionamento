@@ -22,3 +22,17 @@ Content-Type: application/json
     "placa": "XYZ-5678",
     "modelo": "Chevrolet Onix"
 }
+
+### (ESTACIONAR)
+POST http://localhost:5117/api/carro/entrada
+Content-Type: application/json
+
+{
+    "placa": "CCC-1234",
+    "modelo": "AAAAAhaHHHH"
+}
+
+
+### LISTAR VEÍCULOS ESTACIONADOS
+GET http://localhost:5117/api/carro/estacionados
+Accept: application/json
