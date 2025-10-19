@@ -81,7 +81,7 @@ Use o arquivo **`Tests/Test.http`** no VS Code (com a extensão REST Client) ou 
 **Entrada de veículo:**
 
 ```http
-POST http://localhost:5214/api/carro/entrada
+POST http://localhost:5117/api/carro/entrada
 Content-Type: application/json
 
 {
@@ -93,26 +93,16 @@ Content-Type: application/json
 **Saída de veículo:**
 
 ```http
-POST http://localhost:5214/api/carro/saida/40afae3f-b121-4660-949c-411894fc6197
+POST http://localhost:5117/api/carro/saida/40afae3f-b121-4660-949c-411894fc6197
 ```
 
 **Relatório diário:**
 
 ```http
-GET http://localhost:5214/api/carro/relatorio-diario
+GET http://localhost:5117/api/carro/relatorio-diario
 ```
 
 ---
-
-## 🤝 Contribuições da Equipe
-
-| Membro      | Responsabilidades                                 |
-| ----------- | ------------------------------------------------- |
-| **Leandro** | Configuração do projeto e endpoints de CRUD       |
-| **Luan F**  | Modelos e configuração do banco de dados          |
-| **Gabriel** | Seed de dados, README, testes HTTP e documentação |
-| **Juliano** | Endpoints de entrada, saída e relatório diário    |
-
 
 ### ✅ Resultado Esperado
 
@@ -123,7 +113,3 @@ O sistema estará pronto para:
 * Gerar relatório diário de movimentações;
 * Ser testado via Postman ou REST Client;
 * Ter documentação e testes validados em equipe.
-
-
-
-
