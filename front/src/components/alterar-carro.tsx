@@ -46,7 +46,7 @@ function AlterarCarro() {
     async function salvarEdicao(id: string) {
         try {
             
-            await axios.patch(http://localhost:5117/api/carro/alterar/${id}, {
+            await axios.patch(`http://localhost:5117/api/carro/alterar/${id}`, {
                 placa: editPlaca,
                 modelo: editModelo,
             });

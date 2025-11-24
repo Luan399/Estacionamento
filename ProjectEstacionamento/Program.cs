@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinimalApiEstacionamento.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +10,11 @@ builder.Services.AddDbContext<AppDataContext>(options =>
     options.UseSqlite("Data Source=Estacionamento.db"));
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
@@ -17,6 +22,10 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 
 var app = builder.Build();
+
+
+app.UseCors("AllowAll");
+
 
 app.MapGet("/", () => "API Estacionamento");
 
@@ -75,10 +84,14 @@ using (var scope = app.Services.CreateScope())
 
 // ----------------- ESTACIONAMENTO -----------------
 
-// Entrada de veículo
-app.MapPost("/api/carro/entrada", async ([FromBody] Carro carro, [FromServices] AppDataContext ctx) =>
+
+app.MapPost("/api/carro/entrada/{placa}", async ([FromRoute] string placa, [FromServices] AppDataContext ctx) =>
 {
-    if (ctx.Carros.Any(c => c.Placa == carro.Placa && c.Estacionado))
+    var carro = await ctx.Carros.FirstOrDefaultAsync(c => c.Placa == placa);
+    if (carro is null)
+        return Results.NotFound("Carro não cadastrado.");
+
+    if (carro.Estacionado)
         return Results.Conflict("Veículo já está estacionado.");
 
     var vaga = await ctx.Vagas.FirstOrDefaultAsync(v => !v.Ocupada);
@@ -87,18 +100,15 @@ app.MapPost("/api/carro/entrada", async ([FromBody] Carro carro, [FromServices] 
 
     carro.Estacionado = true;
     carro.HoraEntrada = DateTime.Now;
-    carro.Vaga = vaga;
     carro.VagaId = vaga.Id;
-
-    ctx.Carros.Add(carro);
+    carro.Vaga = vaga;
 
     vaga.Ocupada = true;
     vaga.VeiculoId = carro.Id;
 
     await ctx.SaveChangesAsync();
-    return Results.Created($"/api/carro/{carro.Id}", carro);
+    return Results.Ok(carro);
 });
-
 // Listar veículos estacionados
 app.MapGet("/api/carro/estacionados", async ([FromServices] AppDataContext ctx) =>
 {
@@ -163,13 +173,34 @@ app.MapGet("/api/carro/relatorio-diario", async ([FromServices] AppDataContext c
 
     var total = saidas.Count;
     var media = total == 0 ? 0 : saidas.Average(s => s.TempoPermanenciaMinutos);
+    var totalMinutos = saidas.Sum(s => s.TempoPermanenciaMinutos);
 
     return Results.Ok(new
     {
         Data = hoje,
         TotalSaidas = total,
-        TempoMedioMinutos = media
+        TempoMedioMinutos = media,
+        TotalMinutos = totalMinutos
     });
+});
+
+// Listar todas as saídas
+app.MapGet("/api/carro/saidas", async ([FromServices] AppDataContext ctx) =>
+{
+    var lista = await ctx.Saidas.ToListAsync();
+    return Results.Ok(lista);
+});
+
+
+app.MapGet("/api/carro/saidas-dia/{date}", async ([FromRoute] string date, [FromServices] AppDataContext ctx) =>
+{
+    if (!DateTime.TryParse(date, out var d))
+        return Results.BadRequest("Data inválida");
+
+    var lista = await ctx.Saidas
+        .Where(s => s.HoraSaida.Date == d.Date)
+        .ToListAsync();
+    return Results.Ok(lista);
 });
 
 

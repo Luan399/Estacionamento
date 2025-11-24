@@ -1,6 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import CadastrarCarro from './components/cadastrar-carro';
+import ListarCarros from './components/listar-carros';
+import RelatorioDiarioSaidas from './components/relatorio-diario-saidas';
+import AlterarCarro from './components/alterar-carro';
+
 
 
 
