@@ -2,12 +2,14 @@
 import React, { useState } from "react";
 import { carro } from "../models/carro";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 
 function CadastrarCarro() {
     
     const [placa, setPlaca] = useState("");
     const [modelo, setModelo] = useState("");
+  const navigate = useNavigate();
 
     
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -24,6 +26,7 @@ function CadastrarCarro() {
       };
       const resposta = await axios.post("http://localhost:5117/api/carro/cadastrar", carroPayload);
       console.log(resposta.data);
+      navigate("/");
     } catch (error : any) {
       const status = error?.response?.status;
       if(status === 409){

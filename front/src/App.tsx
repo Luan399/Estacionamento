@@ -4,7 +4,7 @@ import CadastrarCarro from './components/cadastrar-carro';
 import ListarCarros from './components/listar-carros';
 import RelatorioDiarioSaidas from './components/relatorio-diario-saidas';
 import AlterarCarro from './components/alterar-carro';
-
+import './index.css';
 
 
 
